@@ -1,10 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import landing from '../assets/landing.jpg'
 import ProjectCard from '../components/ProjectCard'
 import { Card } from 'react-bootstrap'
 
 const Home = () => {
+
+  const [isLogin, setIsLogin] = useState(false)
+
+  useEffect(()=>{
+    if(sessionStorage.getItem("token")){
+      setIsLogin(true)
+    }else{
+      setIsLogin(false)
+    }
+  },[])
+
   return (
     <>
       {/* Landing */}
@@ -17,7 +28,12 @@ const Home = () => {
                  Where User can add and manage their projects. As well as access all projects available in our 
                  website... What are you waiting for!!!.
               </p>
-              <Link to={'/login'} className='btn btn-warning'>STARTS TO EXPLORE</Link>
+              {
+                isLogin?
+                <Link to={'/dashboard'} className='btn btn-warning'>MANAGE YOUR PROJECTS</Link>
+                :
+                <Link to={'/login'} className='btn btn-warning'>STARTS TO EXPLORE</Link>
+              }
             </div>
             <div className="col-lg-6">
               <img src={landing} alt="no img" className="img-fluid" />
