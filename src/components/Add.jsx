@@ -1,37 +1,67 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState, useEffect} from 'react';
 import { Modal, Button } from 'react-bootstrap'
 import uploadProjectImg from '../assets/uploadImg.png'
 
 const Add = () => {
 
-  const [preview, setPreview] = useState("")
-  const [uploadFileStatus, setUploadFileStatus] = useState(false)
+  const [preview,setPreview] = useState("")
+  const [uploadFileStatus,setUploadFileStatus] = useState(false)
 
-  const [projectDetails, setProjectDetails] = useState({
-    title : "", languages : "", overview : "", github : "", website : "", projectImage : ""
+  const [projectDetails,setProjectDetails] = useState ({
+    title:"", languages:"", overview:"", gitHub:"", website:"", projectImage:""
   })
+
   console.log(projectDetails);
+  
+
+  const [show, setShow] = useState(false);
 
   useEffect(()=>{
     if(projectDetails.projectImage.type=="image/png" || projectDetails.projectImage.type=="image/jpg" || projectDetails.projectImage.type=="image/jpeg"){
       setUploadFileStatus(true)
       setPreview(URL.createObjectURL(projectDetails.projectImage))
     }else{
-      // invalid image file
       setUploadFileStatus(false)
       setProjectDetails({...projectDetails,projectImage:""})
     }
-  },[projectDetails.projectImage])
-  
-  const [show, setShow] = useState(false);
+   },[projectDetails.projectImage])
 
   const handleClose = () => setShow(false);
+
   const handleShow = () => {
-    setShow(true);
-    setPreview("")
-    setUploadFileStatus(false)
-    setProjectDetails({title : "", languages : "", overview : "", github : "", website : "", projectImage : ""})
+   setShow(true);
+   setPreview("")
+   setUploadFileStatus(false)
+   setProjectDetails({title:"", languages:"", overview:"", gitHub:"", website:"", projectImage:""})
   }
+
+  const handleAddProject = () => {
+    const {title,languages,overview,github,website,projectImage} = projectDetails
+    if(title && languages && overview && github && website && projectImage) {
+
+      // api call
+      const reqBody = new FormData()
+      reqBody.append('title',title)
+      reqBody.append('languages',languages)
+      reqBody.append('overview',overview)
+      reqBody.append('github',github)
+      reqBody.append('website',website)
+      reqBody.append('projectImage',projectImage)
+
+      const token = sessionStorage.getItem("token")
+      if(token) {
+        const reqHeader = {
+          "Content-Type":"multipart/form-data",
+          "Authorization":`Bearer ${token}`
+        }
+
+        // make api call
+      }
+
+    } else {
+      alert("Please fill all the fields")
+    }
+    }
 
   return (
     <>
@@ -52,7 +82,7 @@ const Add = () => {
           <div className="row align-items-center">
             <div className="col-lg-4">
               <label>
-                <input onChange={e=>setProjectDetails({...projectDetails,projectImage:e.target.files[0]})} type="file" style={{display:'none'}}/>
+                <input onChange={e => setProjectDetails({...projectDetails,projectImage:e.target.files[0]})} type="file" style={{display:'none'}}/>
                 <img height={'200px'} src={preview?preview:uploadProjectImg} alt="upload" className="img-fluid"/>
               </label>
               {
@@ -62,19 +92,19 @@ const Add = () => {
             </div>
             <div className="col-lg-8">
               <div className="mb-2">
-                <input value={projectDetails.title} onChange={e=>setProjectDetails({...projectDetails,title:e.target.value})} type="text" className="form-control" placeholder="Project title"/>
+                <input value={projectDetails.title} onChange={e => setProjectDetails({...projectDetails,title:e.target.value})} type="text" className="form-control" placeholder="Project title"/>
               </div>
               <div className="mb-2">
-                <input value={projectDetails.languages} onChange={e=>setProjectDetails({...projectDetails,languages:e.target.value})} type="text" className="form-control" placeholder="Project languages"/>
+                <input value={projectDetails.languages} onChange={e => setProjectDetails({...projectDetails,languages:e.target.value})} type="text" className="form-control" placeholder="Project languages"/>
               </div>
               <div className="mb-2">
-                <input value={projectDetails.overview} onChange={e=>setProjectDetails({...projectDetails,overview:e.target.value})} type="text" className="form-control" placeholder="Project overview"/>
+                <input value={projectDetails.overview} onChange={e => setProjectDetails({...projectDetails,overview:e.target.value})} type="text" className="form-control" placeholder="Project overview"/>
               </div>
               <div className="mb-2">
-                <input value={projectDetails.github} onChange={e=>setProjectDetails({...projectDetails,github:e.target.value})} type="text" className="form-control" placeholder="Project GitHub link"/>
+                <input value={projectDetails.gitHub} onChange={e => setProjectDetails({...projectDetails,gitHub:e.target.value})} type="text" className="form-control" placeholder="Project GitHub link"/>
               </div>
               <div className="mb-2">
-                <input value={projectDetails.website} onChange={e=>setProjectDetails({...projectDetails,website:e.target.value})} type="text" className="form-control" placeholder="Project website link"/>
+                <input value={projectDetails.website} onChange={e => setProjectDetails({...projectDetails,website:e.target.value})} type="text" className="form-control" placeholder="Project website link"/>
               </div>
             </div>
           </div>
@@ -83,10 +113,9 @@ const Add = () => {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary">Add</Button>
+          <Button onClick={handleAddProject} variant="primary">Add</Button>
         </Modal.Footer>
       </Modal>
-
     </>
   )
 }
