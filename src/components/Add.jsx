@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { Modal, Button } from 'react-bootstrap'
 import uploadProjectImg from '../assets/uploadImg.png'
+import { addProjectAPI } from '../services/allAPI';
 
 const Add = () => {
 
@@ -11,8 +12,7 @@ const Add = () => {
     title:"", languages:"", overview:"", gitHub:"", website:"", projectImage:""
   })
 
-  console.log(projectDetails);
-  
+  // console.log(projectDetails);
 
   const [show, setShow] = useState(false);
 
@@ -35,16 +35,16 @@ const Add = () => {
    setProjectDetails({title:"", languages:"", overview:"", gitHub:"", website:"", projectImage:""})
   }
 
-  const handleAddProject = () => {
-    const {title,languages,overview,github,website,projectImage} = projectDetails
-    if(title && languages && overview && github && website && projectImage) {
+  const handleAddProject = async () => {
+    const {title,languages,overview,gitHub,website,projectImage} = projectDetails
+    if(title && languages && overview && gitHub && website && projectImage) {
 
       // api call
       const reqBody = new FormData()
       reqBody.append('title',title)
       reqBody.append('languages',languages)
       reqBody.append('overview',overview)
-      reqBody.append('github',github)
+      reqBody.append('github',gitHub)
       reqBody.append('website',website)
       reqBody.append('projectImage',projectImage)
 
@@ -54,14 +54,27 @@ const Add = () => {
           "Content-Type":"multipart/form-data",
           "Authorization":`Bearer ${token}`
         }
-
         // make api call
+        try{
+          const result = await addProjectAPI(reqBody,reqHeader)
+          console.log(result);
+          if(result.status==200){
+            alert(`${result?.data?.title} uploaded successfully!`)
+            handleClose()
+          }else{
+            if(result.response.status==406){
+              alert(result.response.data)
+            }
+          }
+        }catch(err){
+          console.log(err);
+        }
       }
 
     } else {
       alert("Please fill all the fields")
     }
-    }
+  }
 
   return (
     <>
