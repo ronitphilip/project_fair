@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import landing from '../assets/landing.jpg'
 import ProjectCard from '../components/ProjectCard'
 import { Card } from 'react-bootstrap'
@@ -9,8 +9,9 @@ const Home = () => {
 
   const [ homeProjects, setHomeProjects ] = useState([])
   const [ isLogin, setIsLogin ] = useState(false)
-  console.log(homeProjects);
-  
+  // console.log(homeProjects);
+  const navigate = useNavigate()
+
   useEffect(()=>{
     getHomeProjects()
     if(sessionStorage.getItem("token")){
@@ -29,6 +30,17 @@ const Home = () => {
       }
     }catch(err){
       console.log(err);
+    }
+  }
+
+  const handleNavigateToProject = () => {
+    // user is logined?
+    if(sessionStorage.getItem("token")){
+      // authorised then redirect
+      navigate('/projects')
+    }else{
+      // not authorised
+      alert('Please login to get full access to our collection')
     }
   }
 
@@ -64,15 +76,15 @@ const Home = () => {
         <marquee>
           <div className="d-flex">
             {
-              homeProjects.map(project=>(
-                <div className="me-5">
+              homeProjects?.map(project=>(
+                <div key={project?._id} className="me-5">
                   <ProjectCard displatData={project}/>
                 </div>
               ))
             }
           </div>
         </marquee>
-        <button className="btn btn-link mt-5">Click here to see more projects...</button>
+        <button onClick={handleNavigateToProject} className="btn btn-link mt-5">Click here to see more projects...</button>
       </div>
 
       {/* Testimonial */}
